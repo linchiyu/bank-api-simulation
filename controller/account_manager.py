@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 from model.account import Account
 
@@ -44,7 +44,7 @@ class AccountManager:
 
     def deposit(self, account_id: str, amount: float) -> Account:
         """
-        Deposits the specified amount into the account balance.
+        Deposits the specified amount into the account balance, if the account does not exist, it will be created.
 
         Args:
             account_id (int): The ID of the account to deposit into.
@@ -87,6 +87,34 @@ class AccountManager:
 
         # Return the updated account
         return account
+
+    def transfer(self, origin_id: str, destination_id: str, amount: float) -> Tuple[Optional[Account], Optional[Account]]:
+        """
+        Transfers the specified amount from the origin account to the destination account.
+
+        Args:
+            origin_id (str): The ID of the account to transfer from.
+            destination_id (str): The ID of the account to transfer to.
+            amount (float): The amount to transfer.
+
+        Returns:
+            Optional[Tuple[Account, Account]]:
+                A tuple containing the updated origin account (Account) and the destination account (Account),
+                or None if the origin account does not exist.
+        """
+        # Retrieve the origin account from the dictionary using the origin_id
+        origin = self.get_account(origin_id)
+
+        # If the origin account does not exist, return None
+        if origin is None:
+            return None, None
+
+        # Transfer the specified amount from the origin account to the destination account
+        origin.withdraw(amount) # Withdraw the specified amount from the origin account
+        destination = self.deposit(destination_id, amount) # Deposit the specified amount into the destination account
+
+        # Return the updated origin account and the destination account
+        return origin, destination
 
     def reset(self) -> None:
         """
